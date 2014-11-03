@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ShutterstockTask</string>
+    <string name="notification_title">Image download</string>
+    <string name="notification_progress">Download in progress</string>
+    <string name="notification_completed">Download completed</string>
+    <string name="toast_download_started">Download started</string>
+    <string name="toast_download_finished">Download completed. Image URI:</string>
+    <string name="download_failed">Download failed</string>
+    <string name="download_cancelled">Download cancelled</string>
+
+</resources>
