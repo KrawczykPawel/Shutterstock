@@ -116,6 +116,7 @@ public class MainActivity extends Activity {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 mCurrentCanceledId = bundle.getInt(DownloadService.NOTIFICATION_ID);
+                // bind to service in order to invoke cancel method
                 bindService(new Intent(MainActivity.this, DownloadService.class), mConnection, Context.BIND_AUTO_CREATE);
             }
         }
@@ -133,6 +134,7 @@ public class MainActivity extends Activity {
             mBounded = true;
             DownloadService.LocalBinder mLocalBinder = (DownloadService.LocalBinder) service;
             mDownloadService = mLocalBinder.getServerInstance();
+            // Cancel download with given id
             mDownloadService.cancelDownload(mCurrentCanceledId);
         }
     };

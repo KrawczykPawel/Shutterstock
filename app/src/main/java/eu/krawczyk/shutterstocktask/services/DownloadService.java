@@ -96,15 +96,7 @@ public class DownloadService extends IntentService {
                         + " " + connection.getResponseMessage());
                 mResult = EDownloadStatus.FAILED.ordinal();
             } else {
-                mNotificationId = new Random().nextInt(Integer.MAX_VALUE);
-                Intent notificationIntent = new Intent(ACTION_CANCEL);
-                notificationIntent.putExtra(NOTIFICATION_ID, mNotificationId);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                mBuilder = new NotificationCompat.Builder(this);
-                mBuilder.setContentTitle(getText(R.string.notification_title))
-                        .setContentText(getText(R.string.notification_progress))
-                        .setSmallIcon(R.drawable.ic_stat_notification);
-                mBuilder.addAction(R.drawable.ic_stat_deny, getText(android.R.string.cancel), pendingIntent);
+                prepareNotification();
                 int fileLength = connection.getContentLength();
                 inputStream = connection.getInputStream();
                 byte data[] = new byte[BUFFER_SIZE];
@@ -155,6 +147,20 @@ public class DownloadService extends IntentService {
         }
     }
 
+    // Create progress notification with cancel action
+    private void prepareNotification() {
+        mNotificationId = new Random().nextInt(Integer.MAX_VALUE);
+        Intent notificationIntent = new Intent(ACTION_CANCEL);
+        notificationIntent.putExtra(NOTIFICATION_ID, mNotificationId);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setContentTitle(getText(R.string.notification_title))
+                .setContentText(getText(R.string.notification_progress))
+                .setSmallIcon(R.drawable.ic_stat_notification);
+        mBuilder.addAction(R.drawable.ic_stat_deny, getText(android.R.string.cancel), pendingIntent);
+    }
+
+    // Update progress on notification or change it to finished/canceled notification
     private void updateNotification(int currentProgress) {
         if (currentProgress < MAX_PROGRESS) {
             mBuilder.setProgress(MAX_PROGRESS, currentProgress, false);
@@ -168,6 +174,7 @@ public class DownloadService extends IntentService {
         mNotifyManager.notify(mNotificationId, mBuilder.build());
     }
 
+    // Publish result in form of toast in MainActivity
     private void publishResults(String outputPath, int result, int progress) {
         Intent intent = new Intent(NOTIFICATION);
         intent.putExtra(FILEPATH, outputPath);
@@ -180,6 +187,7 @@ public class DownloadService extends IntentService {
         return mBinder;
     }
 
+    //Service binder
     public class LocalBinder extends Binder {
         public DownloadService getServerInstance() {
             return DownloadService.this;
