@@ -65,6 +65,7 @@ public class MainActivity extends Activity {
 
     private int mCurrentCanceledId;
 
+    // It is only fake data for presentation
     private static List<ImageFile> sFakeData = new ArrayList<ImageFile>() {
         {
             add(new ImageFile("img1.jpg", "http://www2.shutterstock.com/webstack/img/lohp/carousel/Vectors/shutterstock_121795933.jpg", "http://image.shutterstock.com/display_pic_with_logo/614824/121795933/stock-vector-abstract-seamless-background-121795933.jpg"));
@@ -83,6 +84,7 @@ public class MainActivity extends Activity {
         }
     };
 
+    // BroadcastReceiver for download status
     private BroadcastReceiver mDownloadBroadcastReceiver = new BroadcastReceiver() {
 
         @Override
@@ -106,6 +108,7 @@ public class MainActivity extends Activity {
         }
     };
 
+    // BroadcastReceiver for download cancel
     private BroadcastReceiver mDownloadCancelBroadcastReceiver = new BroadcastReceiver() {
 
         @Override
@@ -118,6 +121,7 @@ public class MainActivity extends Activity {
         }
     };
 
+    // ServiceConnection for binding to DownloadService
     private ServiceConnection mConnection = new ServiceConnection() {
 
         public void onServiceDisconnected(ComponentName name) {
