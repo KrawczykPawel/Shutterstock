@@ -121,12 +121,12 @@ public class DownloadService extends IntentService {
                 // finished
                 if (mIsCancelled == true) {
                     mResult = EDownloadStatus.CANCELLED.ordinal();
-                    updateNotification(MAX_PROGRESS);
                     // Reset mIsCancelled flag
                     mIsCancelled = false;
                 } else {
                     mResult = EDownloadStatus.SUCCESS.ordinal();
                 }
+                updateNotification(MAX_PROGRESS);
             }
         } catch (Exception e) {
             Log.e(Constants.General.TAG, "Exception while downloading image: " + e);

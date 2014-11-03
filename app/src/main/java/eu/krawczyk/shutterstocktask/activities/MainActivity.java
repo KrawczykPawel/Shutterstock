@@ -141,31 +141,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        mLayoutManager = new GridLayoutManager(this, 2);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        ImageFile imageFile = sFakeData.get(position);
-                        Intent intent = new Intent(MainActivity.this, DownloadService.class);
-                        // add infos for the service which file to download and where to store
-                        intent.putExtra(DownloadService.URL,
-                                imageFile.getUrl());
-                        intent.putExtra(DownloadService.NAME,
-                                imageFile.getName());
-                        startService(intent);
-                        Toast.makeText(MainActivity.this, R.string.toast_download_started,
-                                Toast.LENGTH_LONG).show();
-                    }
-                })
-        );
-
-        // specify an adapter (see also next example)
+        prepareRecyclerView();
         RequestQueue requestQueue = Volley.newRequestQueue(ShutterstockTask.getApplication());
         ImageLoader mImageLoader = new ImageLoader(requestQueue, new ImageLoader.ImageCache() {
             private final LruCache<String, Bitmap> mCache = new LruCache<String, Bitmap>(100);
@@ -186,13 +162,19 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Register receivers
         registerReceiver(mDownloadBroadcastReceiver, new IntentFilter(DownloadService.NOTIFICATION));
         registerReceiver(mDownloadCancelBroadcastReceiver, new IntentFilter(DownloadService.ACTION_CANCEL));
+        if (checkNetworkAndNotify()) {
+            // Refresh view
+            mRecyclerView.getAdapter().notifyDataSetChanged();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        // Unregister receivers
         unregisterReceiver(mDownloadBroadcastReceiver);
         unregisterReceiver(mDownloadCancelBroadcastReceiver);
     }
@@ -221,5 +203,50 @@ public class MainActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         return super.onOptionsItemSelected(item);
+    }
+
+
+    /**
+     * Check if internet access is available and notify user by Toast
+     *
+     * @return true if internet is available
+     */
+    private boolean checkNetworkAndNotify() {
+        if (Utils.isOnline() == false) {
+            Toast.makeText(MainActivity.this, R.string.no_network,
+                    Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Find recycler view and set layout manager and on click listener.
+     */
+    private void prepareRecyclerView() {
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        // use a GridLayoutManager manager
+        mLayoutManager = new GridLayoutManager(this, 2);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        if (checkNetworkAndNotify()) {
+                            ImageFile imageFile = sFakeData.get(position);
+                            Intent intent = new Intent(MainActivity.this, DownloadService.class);
+                            // add infos for the service which file to download and where to store
+                            intent.putExtra(DownloadService.URL,
+                                    imageFile.getUrl());
+                            intent.putExtra(DownloadService.NAME,
+                                    imageFile.getName());
+                            startService(intent);
+                            Toast.makeText(MainActivity.this, R.string.toast_download_started,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                })
+        );
     }
 }

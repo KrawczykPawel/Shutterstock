@@ -16,9 +16,14 @@
 
 package eu.krawczyk.shutterstocktask.helpers;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.krawczyk.shutterstocktask.ShutterstockTask;
 import eu.krawczyk.shutterstocktask.model.ImageFile;
 
 /**
@@ -41,5 +46,12 @@ public class Utils {
             }
         }
         return clonedList;
+    }
+
+    public static boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) ShutterstockTask.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

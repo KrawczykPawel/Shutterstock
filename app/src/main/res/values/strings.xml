@@ -9,5 +9,6 @@
     <string name="toast_download_finished">Download completed. Image URI:</string>
     <string name="download_failed">Download failed</string>
     <string name="download_cancelled">Download cancelled</string>
+    <string name="no_network">No internet access</string>
 
 </resources>
